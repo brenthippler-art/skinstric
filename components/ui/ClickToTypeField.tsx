@@ -41,11 +41,11 @@ export default function ClickToTypeField({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => {
-            if (isAutoFocusing.current) {
-                isAutoFocusing.current = false;
-                return;
-            }
-            setIsFocused(true)
+          if (isAutoFocusing.current) {
+            isAutoFocusing.current = false;
+            return;
+          }
+          setIsFocused(true);
         }}
         onClick={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}

@@ -2,13 +2,17 @@ import { ReactNode } from "react";
 
 interface DiamondFrameProps {
   children: ReactNode;
+  scale?: number;
 }
 
 const RING_BOXES = [762, 682, 602];
 const RING_OPACITIES = [0.3, 0.6, 1];
 
-export default function DiamondFrame({ children }: DiamondFrameProps) {
-  const outerBox = RING_BOXES[0];
+export default function DiamondFrame({
+  children,
+  scale = 1,
+}: DiamondFrameProps) {
+  const outerBox = RING_BOXES[0] * scale;
 
   return (
     <div
@@ -22,7 +26,7 @@ export default function DiamondFrame({ children }: DiamondFrameProps) {
         viewBox={`0 0 ${outerBox} ${outerBox}`}
       >
         {RING_BOXES.map((box, i) => {
-          const side = box * 0.7071;
+          const side = box * scale * 0.7071;
           const offset = (outerBox - side) / 2;
           return (
             <rect
