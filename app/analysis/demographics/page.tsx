@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/ui/SiteHeader";
 import NavDiamondButton from "@/components/ui/NavDiamondButton";
-import DiamondArrow from "@/components/ui/DiamondArrow";
 import DemographicSidebar from "@/components/ui/DemographicSidebar";
 import DemographicPanel from "@/components/ui/DemographicPanel";
 import DemographicRankedList from "@/components/ui/DemographicRankedList";
@@ -58,13 +57,6 @@ export default function DemographicPage() {
     );
   }
 
-  function cycleCategory(direction: 1 | -1) {
-    const idx = CATEGORY_ORDER.indexOf(activeCategory);
-    const nextIdx =
-      (idx + direction + CATEGORY_ORDER.length) % CATEGORY_ORDER.length;
-    setActiveCategory(CATEGORY_ORDER[nextIdx]);
-  }
-
   const sidebarBoxes = CATEGORY_ORDER.map((cat) => ({
     key: cat,
     value: titleCase(selected[cat]),
@@ -93,6 +85,8 @@ export default function DemographicPage() {
   }
 
   function handleReset() {
+    if (!data) return;
+
     setSelected({
       race: topLabel(data.race),
       age: topLabel(data.age),
@@ -101,39 +95,37 @@ export default function DemographicPage() {
   }
 
   return (
-    <div className="relative h-screen overflow-hidden">
+    <div className="relative flex min-h-screen flex-col overflow-y-auto md:h-screen md:overflow-hidden">
       <SiteHeader section="ANALYSIS" />
 
-      <div className="absolute left-8 top-20 flex flex-col gap-6">
-        <span className="uppercase text-[16px] font-semibold">
+      <div className="flex flex-col px-8">
+        <span className="text-[16px] font-semibold uppercase tracking-[-0.02em] leading-6 text-foreground pt-8">
           A. I. Analysis
         </span>
-        <h2 className="text-[72px] font-normal uppercase leading-10 tracking-[-0.05em] text-foreground">
+        <h2 className="text-[clamp(2.5rem,3.75vw,4.5rem)] font-normal uppercase leading-tight tracking-[-0.05em] text-foreground">
           DEMOGRAPHICS
         </h2>
-        <p className="uppercase">Predicted Race & Age</p>
+        <p className="label-caps text-foreground lg:pb-18">Predicted Race & Age</p>
       </div>
 
-      <div className="absolute inset-x-0 top-66 bottom-24 flex items-center pl-8">
-        <div className="flex items-start gap-4">
-          <DemographicSidebar
-            boxes={sidebarBoxes}
-            onSelectCategory={(key) => setActiveCategory(key as Category)}
-          />
-          <DemographicPanel
-            value={titleCase(activeSelectedRaw)}
-            percentage={activePercentage}
-          />
-          <DemographicRankedList
-            category={CATEGORY_DISPLAY[activeCategory]}
-            items={rankedItems}
-            selectedLabel={titleCase(activeSelectedRaw)}
-            onSelectedLabel={handleSelectedLabel}
-          />
-        </div>
+      <div className="flex flex-1 flex-wrap items-start gap-4 px-6 py-8 md:gap-6 md:px-10 lg:min-h-0 lg:flex-nowrap lg:px-0 lg:py-0 lg:[gap:0.83vw] lg:[padding-left:1.67vw]">
+        <DemographicSidebar
+          boxes={sidebarBoxes}
+          onSelectCategory={(key) => setActiveCategory(key as Category)}
+        />
+        <DemographicPanel
+          value={titleCase(activeSelectedRaw)}
+          percentage={activePercentage}
+        />
+        <DemographicRankedList
+          category={CATEGORY_DISPLAY[activeCategory]}
+          items={rankedItems}
+          selectedLabel={titleCase(activeSelectedRaw)}
+          onSelectedLabel={handleSelectedLabel}
+        />
       </div>
 
-      <div className="absolute bottom-10 left-6 right-6 flex items-center justify-between md:left-10 md:right-10">
+      <div className="flex items-center justify-between px-6 pb-10 md:px-10">
         <NavDiamondButton
           label="Back"
           direction="left"
@@ -143,13 +135,13 @@ export default function DemographicPage() {
         <div className="flex gap-4">
           <button
             onClick={handleReset}
-            className="text-foreground uppercase text-xs border border-foreground px-4 py-2 cursor-pointer"
+            className="label-caps border border-foreground px-4 py-2 cursor-pointer"
           >
             Reset
           </button>
           <button
             onClick={() => console.log("Confirmed selections:", selected)}
-            className="text-background text-xs uppercase bg-foreground text-background px-4 py-2 cursor-pointer"
+            className="label-caps bg-foreground text-background px-4 py-2 cursor-pointer"
           >
             Confirm
           </button>

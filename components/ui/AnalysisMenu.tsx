@@ -1,17 +1,13 @@
 "use client";
 
 interface AnalysisMenuProps {
-  onSelect: (section: string) => void;
+  onSelect: (slug: string) => void;
 }
 
 const QUADRANTS = [
   { label: "Demographics", slug: "demographics", position: "top" as const },
   { label: "Skin Type\nDetails", slug: "skin-type", position: "left" as const },
-  {
-    label: "Cosmetic\nConcerns",
-    slug: "consmetic-concerns",
-    position: "right" as const,
-  },
+  { label: "Cosmetic\nConcerns", slug: "cosmetic-concerns", position: "right" as const },
   { label: "Weather", slug: "weather", position: "bottom" as const },
 ];
 
@@ -20,30 +16,48 @@ const HALF = BOX / 2;
 
 export default function AnalysisMenu({ onSelect }: AnalysisMenuProps) {
   return (
-    <div
-      className="relative mx-auto"
-      style={{ width: BOX, height: BOX, transform: "rotate(45deg)" }}
-    >
-      {QUADRANTS.map(({ label, slug, position }) => (
-        <button
-          key={position}
-          onClick={() => onSelect(slug)}
-          className="absolute flex items-center justify-center border border-background bg-[#F3F3F4] hover:bg-[#E1E1E2] transition-colors cursor-pointer"
-          style={{
-            width: HALF,
-            height: HALF,
-            top: position === "left" || position === "bottom" ? HALF : 0,
-            left: position === "right" || position === "bottom" ? HALF : 0,
-          }}
-        >
-          <span
-            className="whitespace-pre-line text-center text-[16px] font-semibold uppercase tracking-[-0.02em] leading-6 text-foreground"
-            style={{ transform: "rotate(-45deg)" }}
+    <>
+      {/* sm and up: rotated four-quadrant diamond */}
+      <div
+        className="relative mx-auto hidden sm:block"
+        style={{ width: BOX, height: BOX, transform: "rotate(45deg)" }}
+      >
+        {QUADRANTS.map(({ label, slug, position }) => (
+          <button
+            key={position}
+            onClick={() => onSelect(slug)}
+            className="absolute flex items-center justify-center border border-background bg-[#F3F3F4] hover:bg-[#E1E1E2] transition-colors cursor-pointer"
+            style={{
+              width: HALF,
+              height: HALF,
+              top: position === "left" || position === "bottom" ? HALF : 0,
+              left: position === "right" || position === "bottom" ? HALF : 0,
+            }}
           >
-            {label}
-          </span>
-        </button>
-      ))}
-    </div>
+            <span
+              className="whitespace-pre-line text-center text-[16px] font-semibold uppercase tracking-[-0.02em] leading-6 text-foreground"
+              style={{ transform: "rotate(-45deg)" }}
+            >
+              {label}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Below sm only: simple vertical list, no rotation needed */}
+      <div className="flex w-full max-w-xs flex-col gap-2 sm:hidden">
+        {QUADRANTS.map(({ label, slug }) => (
+          <button
+            key={slug}
+            onClick={() => onSelect(slug)}
+            className="flex cursor-pointer items-center justify-center bg-[#F3F3F4] px-6 py-5 text-center active:bg-[#E1E1E2]"
+          >
+            <span className="text-[16px] font-semibold uppercase tracking-[-0.02em] leading-6 text-foreground">
+              {label.replace("\n", " ")}
+            </span>
+          </button>
+        ))}
+      </div>
+    </>
   );
 }

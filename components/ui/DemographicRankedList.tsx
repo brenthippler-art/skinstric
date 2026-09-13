@@ -39,10 +39,7 @@ export default function DemographicRankedList({
   onSelectedLabel,
 }: DemographicRankedItemProps) {
   return (
-    <div
-      className="relative flex flex-col bg-[#F3F3F4]"
-      style={{ width: 448, height: 544 }}
-    >
+    <div className="relative flex w-full flex-col bg-[#F3F3F4] md:[height:min(56.67vh,544px)] md:[width:min(23.33vw,448px)] md:overflow-y-auto">
       <span className="absolute inset-x-0 top-0 h-px bg-foreground" />
 
       <div className="flex items-center justify-between px-4 pt-[14px] pb-2">

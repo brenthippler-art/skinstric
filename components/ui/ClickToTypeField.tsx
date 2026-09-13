@@ -53,7 +53,9 @@ export default function ClickToTypeField({
           if (e.key === "Enter") onSubmit();
         }}
         placeholder={isFocused ? "" : prompt}
-        className={`w-full min-w-[280px] bg-transparent text-center text-[clamp(1.75rem,4vw,3rem)] leading-tight outline-none placeholder:tracking-[-0.07em] placeholder:text-foreground placeholder:text-[60px] placeholder:font-normal ${isFocused ? "caret-foreground" : "caret-transparent"}`}
+        className={`w-full min-w-[280px] bg-transparent text-center text-[clamp(1.75rem,4vw,3rem)] leading-tight tracking-[-0.03em] outline-none placeholder:tracking-[-0.03em] placeholder:text-foreground ${
+          isFocused ? "caret-foreground" : "caret-transparent"
+        }`}
       />
 
       <span

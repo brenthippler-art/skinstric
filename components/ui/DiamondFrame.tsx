@@ -8,19 +8,16 @@ interface DiamondFrameProps {
 const RING_BOXES = [762, 682, 602];
 const RING_OPACITIES = [0.3, 0.6, 1];
 
-export default function DiamondFrame({
-  children,
-  scale = 1,
-}: DiamondFrameProps) {
+export default function DiamondFrame({ children, scale = 1 }: DiamondFrameProps) {
   const outerBox = RING_BOXES[0] * scale;
 
   return (
     <div
-      className="relative flex items-center justify-center mx-auto"
-      style={{ width: outerBox, height: outerBox }}
+      className="relative mx-auto flex items-center justify-center md:[width:var(--diamond-size)] md:[height:var(--diamond-size)]"
+      style={{ "--diamond-size": `${outerBox}px` } as React.CSSProperties}
     >
       <svg
-        className="absolute inset-0"
+        className="absolute inset-0 hidden md:block"
         width={outerBox}
         height={outerBox}
         viewBox={`0 0 ${outerBox} ${outerBox}`}
@@ -46,8 +43,7 @@ export default function DiamondFrame({
           );
         })}
       </svg>
-
-      <div className="relative z-10 flex flex-col items-center text-center px-6">
+      <div className="relative z-10 flex flex-col items-center text-center px-6 py-12 md:py-0">
         {children}
       </div>
     </div>

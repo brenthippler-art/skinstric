@@ -1,22 +1,32 @@
 interface SiteHeaderProps {
   section: string;
   showEnterCode?: boolean;
+  light?: boolean;
 }
 
 export default function SiteHeader({
   section,
   showEnterCode = false,
+  light = false,
 }: SiteHeaderProps) {
+  const bracketColor = light ? "text-[#FCFCFC]" : "text-border-soft";
+  const wordmarkColor = light ? "text-[#FCFCFC]" : "";
+  const sectionColor = light ? "text-[#FCFCFC] opacity-60" : "text-muted";
+
   return (
     <header className="flex items-center justify-between px-6 py-4 md:px-10">
       <div className="flex items-center gap-3">
-        <span className="text-[14px] font-semibold tracking-[-0.02em]">
+        <span
+          className={`text-[14px] font-semibold tracking-[-0.02em] ${wordmarkColor}`}
+        >
           SKINSTRIC
         </span>
-        <span className="text-[14px] font-semibold tracking-[-0.02em] uppercase text-muted flex items-center gap-1">
-          <span className="text-border-soft">[</span>
+        <span
+          className={`text-[14px] font-semibold tracking-[-0.02em] uppercase flex items-center gap-1 ${sectionColor}`}
+        >
+          <span className={bracketColor}>[</span>
           {section}
-          <span className="text-border-soft">]</span>
+          <span className={bracketColor}>]</span>
         </span>
       </div>
       {showEnterCode && (

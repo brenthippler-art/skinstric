@@ -8,6 +8,7 @@ interface NavDiamondButtonProps {
   onClick?: () => void;
   disabled?: boolean;
   solidText?: boolean;
+  light?: boolean;
 }
 
 export default function NavDiamondButton({
@@ -16,15 +17,19 @@ export default function NavDiamondButton({
   onClick,
   disabled = false,
   solidText = false,
+  light = false,
 }: NavDiamondButtonProps) {
-  const icon = <DiamondArrow direction={direction} />;
+  const icon = <DiamondArrow direction={direction} light={light} />;
+  const textColor = light
+    ? solidText
+      ? "text-[#FCFCFC]"
+      : "text-[#FCFCFC] opacity-70"
+    : solidText
+      ? "text-foreground"
+      : "text-foreground/70";
   const text = (
-    // Figma's opacity for nav-button labels is inconsistent across screens —
-    // most use foreground/70, but the Analysis screen's Back/Get Summary
-    // buttons are specified at full foreground. `solidText` lets a page opt
-    // into that exception without changing the shared default everywhere else.
     <span
-      className={`uppercase text-[14px] leading-4 font-semibold tracking-[-0.02em] ${solidText ? "text-foreground" : "text-foreground/70"}`}
+      className={`uppercase text-[14px] leading-4 font-semibold tracking-[-0.02em] ${textColor}`}
     >
       {label}
     </span>
