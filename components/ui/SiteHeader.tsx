@@ -30,8 +30,18 @@ export default function SiteHeader({
         </span>
       </div>
       {showEnterCode && (
-        <button className="uppercase text-[10px] leading-4 font-semibold bg-foreground text-[#FCFCFC] px-4 py-2 cursor-pointer hover:opacity-80 transition-opacity">
-          Enter Code
+        <button className="group flex h-8 w-24 cursor-pointer items-center justify-center bg-foreground transition-colors duration-300 hover:bg-background">
+          <span className="relative inline-block h-4 overflow-hidden">
+            <span className="invisible whitespace-nowrap text-[10px] font-semibold uppercase leading-4">
+              Enter Code
+            </span>
+            <span className="absolute inset-0 flex items-center justify-center whitespace-nowrap text-[10px] font-normal uppercase leading-4 text-background transition-transform duration-300 ease-out group-hover:-translate-y-full">
+              Enter Code
+            </span>
+            <span className="absolute inset-0 flex translate-y-full items-center justify-center whitespace-nowrap text-[10px] font-semibold uppercase leading-4 text-foreground transition-transform duration-300 ease-out group-hover:translate-y-0">
+              Enter Code
+            </span>
+          </span>
         </button>
       )}
     </header>
