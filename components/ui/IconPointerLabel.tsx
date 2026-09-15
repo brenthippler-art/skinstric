@@ -79,7 +79,10 @@ export default function IconPointerLabel({
       {overlay && (
         <div
           className="absolute z-20"
-          style={{ left: `calc(50% + ${overlayDx}px)`, top: `calc(50% + ${overlayDy}px)` }}
+          style={{
+            left: `calc(50% + ${overlayDx}px)`,
+            top: `calc(50% + ${overlayDy}px)`,
+          }}
         >
           {overlay}
         </div>

@@ -19,7 +19,7 @@ const roobert = localFont({
       weight: "600",
       style: "normal",
     },
-     {
+    {
       path: "./fonts/Roobert-TRIAL-Medium.woff2",
       weight: "500",
       style: "normal",

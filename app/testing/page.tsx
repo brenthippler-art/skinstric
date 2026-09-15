@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import SiteHeader from "@/components/ui/SiteHeader";
-import NavDiamondButton from "@/components/ui/NavDiamondButton";
-import ClickToTypeField from "@/components/ui/ClickToTypeField";
 import { validateTextField } from "@/lib/validation";
 import { saveUserInfo } from "@/lib/storage";
 import { submitPhaseOne } from "@/lib/api";
+import { useLayoutEffect, useRef, useState } from "react";
+import { fadeOut } from "@/lib/pageExit";
+import gsap from "gsap";
+import SiteHeader from "@/components/ui/SiteHeader";
+import NavDiamondButton from "@/components/ui/NavDiamondButton";
+import ClickToTypeField from "@/components/ui/ClickToTypeField";
 
 type Step = "name" | "location";
 
@@ -18,15 +20,17 @@ export default function TestingPage() {
   const [location, setLocation] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const contentGroupRef = useRef<HTMLDivElement>(null);
 
-  function handleBack() {
-    setError(null);
-    if (step === "location") {
-      setStep("name");
-    } else {
-      router.push("/");
-    }
-  }
+  useLayoutEffect(() => {
+    gsap.set(contentGroupRef.current, { opacity: 0, y: 30 });
+    gsap.to(contentGroupRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      ease: "power2.out",
+    });
+  }, []);
 
   function handleNameSubmit() {
     const result = validateTextField(name, "Name");
@@ -59,7 +63,22 @@ export default function TestingPage() {
       // is already safely stored locally.
     } finally {
       setSubmitting(false);
-      router.push("/testing/scan");
+      playTestingExit("/testing/scan");
+    }
+  }
+
+  function playTestingExit(destination: string) {
+    fadeOut(contentGroupRef.current, { y: 30 }).then(() =>
+      router.push(destination),
+    );
+  }
+
+  function handleBack() {
+    setError(null);
+    if (step === "location") {
+      setStep("name");
+    } else {
+      playTestingExit("/");
     }
   }
 
@@ -73,7 +92,10 @@ export default function TestingPage() {
         To start analysis
       </span>
 
-      <div className="flex flex-1 items-center justify-center">
+      <div
+        ref={contentGroupRef}
+        className="flex flex-1 items-center justify-center"
+      >
         {step === "name" ? (
           <ClickToTypeField
             key="name"

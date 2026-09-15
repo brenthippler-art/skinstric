@@ -3,7 +3,10 @@ interface CameraPermissionModalProps {
   onDeny: () => void;
 }
 
-export default function CameraPermissionModal({ onAllow, onDeny }: CameraPermissionModalProps) {
+export default function CameraPermissionModal({
+  onAllow,
+  onDeny,
+}: CameraPermissionModalProps) {
   return (
     <div
       className="flex flex-col bg-[#1A1B1C]"

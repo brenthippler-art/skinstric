@@ -1,48 +1,39 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { submitPhaseTwo } from "@/lib/api";
+import { BsCameraFill } from "react-icons/bs";
+import gsap from "gsap";
 import SiteHeader from "@/components/ui/SiteHeader";
 import NavDiamondButton from "@/components/ui/NavDiamondButton";
+import DiamondFrame from "@/components/ui/DiamondFrame";
 import PermissionIcon from "@/components/ui/PermissionIcon";
 import CameraChecklist from "@/components/ui/CameraChecklist";
 import LiveCameraCapture from "@/components/ui/LiveCameraCapture";
-import { submitPhaseTwo } from "@/lib/api";
-import { BsCameraFill } from "react-icons/bs";
 
 type Stage = "loading" | "capturing" | "review";
 
 function SettingUpCamera() {
-  const rings = [
-    { size: 604.03, rotate: -15, opacity: 0.3 },
-    { size: 498, rotate: 0, opacity: 0.6 },
-    { size: 405.18, rotate: 15, opacity: 1 },
-  ];
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    gsap.set(containerRef.current, { opacity: 0 });
+    gsap.to(containerRef.current, {
+      opacity: 1,
+      duration: 0.8,
+      ease: "power2.out",
+    });
+  }, []);
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-6 px-6">
-      <div
-        className="relative hidden items-center justify-center lg:flex"
-        style={{ width: 604.03, height: 604.03 }}
-      >
-        {rings.map((ring, i) => (
-          <span
-            key={i}
-            className="absolute border-2 border-dashed border-[#A0A4AB]"
-            style={{
-              width: ring.size,
-              height: ring.size,
-              opacity: ring.opacity,
-              transform: `rotate(${ring.rotate}deg)`,
-            }}
-          />
-        ))}
+    <div
+      ref={containerRef}
+      className="flex flex-1 flex-col items-center justify-center gap-6 px-6"
+    >
+      <DiamondFrame spin>
         <PermissionIcon icon={<BsCameraFill size={80} />} />
-      </div>
-
-      <div className="lg:hidden">
-        <PermissionIcon icon={<BsCameraFill size={80} />} />
-      </div>
+      </DiamondFrame>
 
       <span className="text-center text-[16px] font-semibold uppercase tracking-[-0.02em] leading-6 text-[#1A1B1C]">
         Setting up camera ...

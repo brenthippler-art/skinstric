@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BsCameraFill, BsImageFill } from "react-icons/bs";
 import { submitPhaseTwo } from "@/lib/api";
+import { fadeOut } from "@/lib/pageExit";
+import gsap from "gsap";
 import SiteHeader from "@/components/ui/SiteHeader";
 import NavDiamondButton from "@/components/ui/NavDiamondButton";
 import IconPointerLabel from "@/components/ui/IconPointerLabel";
@@ -15,6 +17,51 @@ export default function ScanPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showCameraPrompt, setShowCameraPrompt] = useState(false);
+
+  const cameraGroupRef = useRef<HTMLDivElement>(null);
+  const galleryGroupRef = useRef<HTMLDivElement>(null);
+  const mobileCameraRef = useRef<HTMLButtonElement>(null);
+  const mobileGalleryRef = useRef<HTMLButtonElement>(null);
+
+  useLayoutEffect(() => {
+    gsap.set([cameraGroupRef.current, galleryGroupRef.current], {
+      opacity: 0,
+      x: -40,
+    });
+    gsap.set([mobileCameraRef.current, mobileGalleryRef.current], {
+      opacity: 0,
+      y: 30,
+    });
+
+    gsap.to([cameraGroupRef.current, galleryGroupRef.current], {
+      opacity: 1,
+      x: 0,
+      duration: 0.8,
+      ease: "power2.out",
+      stagger: 0.15,
+    });
+
+    gsap.to([mobileCameraRef.current, mobileGalleryRef.current], {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      ease: "power2.out",
+      stagger: 0.15,
+    });
+  }, []);
+
+  function playScanExit(destination: string) {
+    Promise.all([
+      fadeOut([cameraGroupRef.current, galleryGroupRef.current], {
+        x: 40,
+        stagger: 0.1,
+      }),
+      fadeOut([mobileCameraRef.current, mobileGalleryRef.current], {
+        y: 30,
+        stagger: 0.1,
+      }),
+    ]).then(() => router.push(destination));
+  }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -29,7 +76,7 @@ export default function ScanPage() {
           "skinstric_demographics",
           JSON.stringify(result.data),
         );
-        router.push("/analysis");
+        playScanExit("/analysis");
       } catch (err) {
         console.error("Phase Two API call faile: ", err);
       }
@@ -42,7 +89,7 @@ export default function ScanPage() {
       await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user" },
       });
-      router.push("/testing/selfie");
+      playScanExit("/testing/selfie");
     } catch (err) {
       console.error("Camera permission denied or unavailable:", err);
       setShowCameraPrompt(false);
@@ -67,10 +114,11 @@ export default function ScanPage() {
       {/* Desktop layout: connector-line icon groups with dashed diamond frames */}
       <div className="relative hidden flex-1 items-center lg:flex">
         <div
+          ref={cameraGroupRef}
           className="absolute top-1/2 z-20 -translate-y-1/2"
           style={{ left: "calc(25vw - 255.27px)" }}
         >
-          <DiamondFrame scale={0.67}>
+          <DiamondFrame scale={0.67} spin fadeOuterOnHover>
             <IconPointerLabel
               icon={<BsCameraFill size={80} />}
               label={"Allow A.I. \nto Scan Your Face"}
@@ -92,10 +140,11 @@ export default function ScanPage() {
         </div>
 
         <div
+          ref={galleryGroupRef}
           className="absolute top-1/2 z-20 -translate-y-1/2"
           style={{ right: "calc(25vw - 255.27px)" }}
         >
-          <DiamondFrame scale={0.67}>
+          <DiamondFrame scale={0.67} spin fadeOuterOnHover>
             <IconPointerLabel
               icon={<BsImageFill size={80} />}
               label={"Allow A.I. \naccess Gallery"}
@@ -110,6 +159,7 @@ export default function ScanPage() {
       {/* Mobile/tablet fallback: simple stacked icon + label, no connector line */}
       <div className="flex flex-1 flex-col items-center justify-center gap-12 px-6 lg:hidden">
         <button
+          ref={mobileCameraRef}
           onClick={() => setShowCameraPrompt(true)}
           className="flex flex-col items-center gap-4 cursor-pointer"
         >
@@ -120,6 +170,7 @@ export default function ScanPage() {
         </button>
 
         <button
+          ref={mobileGalleryRef}
           onClick={() => fileInputRef.current?.click()}
           className="flex flex-col items-center gap-4 cursor-pointer"
         >
@@ -149,7 +200,7 @@ export default function ScanPage() {
         <NavDiamondButton
           label="Back"
           direction="left"
-          onClick={() => router.push("/testing")}
+          onClick={() => playScanExit("/testing")}
         />
       </div>
 

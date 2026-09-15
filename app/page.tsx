@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
 import SiteHeader from "@/components/ui/SiteHeader";
@@ -40,6 +40,11 @@ export default function IntroPage() {
   const discoverBaseDiamondRef = useRef<HTMLSpanElement>(null);
   const discoverTimelineRef = useRef<gsap.core.Timeline | null>(null);
 
+  const [hasSeenIntro] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return sessionStorage.getItem("skinstric_intro_seen") === "true";
+  });
+
   useLayoutEffect(() => {
     gsap.set(headerRef.current, { opacity: 0 });
     gsap.set(h1Ref.current, { y: 100 });
@@ -47,42 +52,54 @@ export default function IntroPage() {
     gsap.set(discoverGroupRef.current, { x: "-100vw" });
     gsap.set(takeTestGroupRef.current, { x: "100vw" });
 
-    const paths = pathRefs.current.filter(Boolean) as SVGPathElement[];
-
     const tl = gsap.timeline();
 
-    tl.to(
-      paths,
-      { strokeDashoffset: 0, duration: 4, ease: "power1.inOut" },
-      0,
-    )
-      .to(
-        diamondOverlayRef.current,
-        { opacity: 0, duration: 0.6, ease: "power2.out" },
-        "+=0.3",
+    if (hasSeenIntro) {
+      tl.to(h1Ref.current, { y: 0, duration: 1, ease: "power3.out" }, 0)
+        .to(pRef.current, { y: 0, duration: 1, ease: "power3.out" }, 0)
+        .to(
+          discoverGroupRef.current,
+          { x: 0, duration: 1, ease: "power3.out" },
+          0,
+        )
+        .to(
+          takeTestGroupRef.current,
+          { x: 0, duration: 1, ease: "power3.out" },
+          0,
+        );
+    } else {
+      const paths = pathRefs.current.filter(Boolean) as SVGPathElement[];
+
+      tl.to(
+        paths,
+        { strokeDashoffset: 0, duration: 4, ease: "power1.inOut" },
+        0,
       )
-      .to(h1Ref.current, { y: 0, duration: 0.8, ease: "power3.out" }, "<")
-      .to(pRef.current, { y: 0, duration: 0.8, ease: "power3.out" }, "<")
-      .to(
-        discoverGroupRef.current,
-        { x: 0, duration: 0.8, ease: "power3.out" },
-        "<",
-      )
-      .to(
-        takeTestGroupRef.current,
-        { x: 0, duration: 0.8, ease: "power3.out" },
-        "<",
-      )
-      .to(
-        headerRef.current,
-        { opacity: 1, duration: 0.6, ease: "power2.out" },
-        "<",
-      );
+        .to(
+          diamondOverlayRef.current,
+          { opacity: 0, duration: 1, ease: "power2.out" },
+          "+=0.3",
+        )
+        .to(h1Ref.current, { y: 0, duration: 1, ease: "power3.out" }, "<")
+        .to(pRef.current, { y: 0, duration: 1, ease: "power3.out" }, "<")
+        .to(
+          discoverGroupRef.current,
+          { x: 0, duration: 1, ease: "power3.out" },
+          "<",
+        )
+        .to(
+          takeTestGroupRef.current,
+          { x: 0, duration: 1, ease: "power3.out" },
+          "<",
+        );
+
+      sessionStorage.setItem("skinstric_intro_seen", "true");
+    }
 
     return () => {
       tl.kill();
     };
-  }, []);
+  }, [hasSeenIntro]);
 
   useEffect(() => {
     gsap.set([outerDiamondRef.current, innerDiamondRef.current], {
@@ -177,69 +194,107 @@ export default function IntroPage() {
     };
   }, []);
 
+  function playTakeTestExit() {
+    timelineRef.current?.pause(0);
+    gsap.set(h1Ref.current, { x: "-30vw" });
+    gsap.set(discoverGroupRef.current, { opacity: 0 });
+
+    const tl = gsap.timeline({
+      onComplete: () => router.push("/testing"),
+    });
+
+    tl.to(
+      takeTestGroupRef.current,
+      { x: "100vw", duration: 1, ease: "power2.in" },
+      0,
+    )
+      .to(h1Ref.current, { y: "100vh", duration: 1, ease: "power2.in" }, 0)
+      .to(pRef.current, { y: "100vh", duration: 1, ease: "power2.in" }, 0);
+  }
+
+  function playDiscoverExit() {
+    discoverTimelineRef.current?.pause(0);
+    gsap.set(h1Ref.current, { x: "30vw" });
+    gsap.set(takeTestGroupRef.current, { opacity: 0 });
+
+    const tl = gsap.timeline({
+      onComplete: () => router.push("/discover"),
+    });
+
+    tl.to(
+      discoverGroupRef.current,
+      { x: "-100vw", duration: 1, ease: "power2.in" },
+      0,
+    )
+      .to(h1Ref.current, { y: "100vh", duration: 1, ease: "power2.in" }, 0)
+      .to(pRef.current, { y: "100vh", duration: 1, ease: "power2.in" }, 0);
+  }
+
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden">
-      <div
-        ref={diamondOverlayRef}
-        className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-background"
-      >
-        <svg
-          width={REVEAL_BOXES[0]}
-          height={REVEAL_BOXES[0]}
-          viewBox={`0 0 ${REVEAL_BOXES[0]} ${REVEAL_BOXES[0]}`}
+      {!hasSeenIntro && (
+        <div
+          ref={diamondOverlayRef}
+          className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-background"
         >
-          <defs>
+          <svg
+            width={REVEAL_BOXES[0]}
+            height={REVEAL_BOXES[0]}
+            viewBox={`0 0 ${REVEAL_BOXES[0]} ${REVEAL_BOXES[0]}`}
+          >
+            <defs>
+              {REVEAL_BOXES.map((box, i) => {
+                const c = REVEAL_BOXES[0] / 2;
+                const half = box / 2;
+                const d = `M ${c} ${c - half} L ${c + half} ${c} L ${c} ${c + half} L ${c - half} ${c} Z`;
+                const perimeter = box * 2.828427;
+                return (
+                  <mask
+                    key={box}
+                    id={`reveal-mask-${i}`}
+                    maskUnits="userSpaceOnUse"
+                    x={0}
+                    y={0}
+                    width={REVEAL_BOXES[0]}
+                    height={REVEAL_BOXES[0]}
+                  >
+                    <path
+                      ref={(el) => {
+                        pathRefs.current[i] = el;
+                      }}
+                      d={d}
+                      stroke="white"
+                      strokeWidth={6}
+                      strokeLinecap="round"
+                      fill="none"
+                      strokeDasharray={perimeter}
+                      strokeDashoffset={perimeter}
+                    />
+                  </mask>
+                );
+              })}
+            </defs>
+
             {REVEAL_BOXES.map((box, i) => {
               const c = REVEAL_BOXES[0] / 2;
               const half = box / 2;
               const d = `M ${c} ${c - half} L ${c + half} ${c} L ${c} ${c + half} L ${c - half} ${c} Z`;
-              const perimeter = box * 2.828427;
               return (
-                <mask
+                <path
                   key={box}
-                  id={`reveal-mask-${i}`}
-                  maskUnits="userSpaceOnUse"
-                  x={0}
-                  y={0}
-                  width={REVEAL_BOXES[0]}
-                  height={REVEAL_BOXES[0]}
-                >
-                  <path
-                    ref={(el) => {
-                      pathRefs.current[i] = el;
-                    }}
-                    d={d}
-                    stroke="white"
-                    strokeWidth={6}
-                    strokeLinecap="round"
-                    fill="none"
-                    strokeDasharray={perimeter}
-                    strokeDashoffset={perimeter}
-                  />
-                </mask>
+                  d={d}
+                  fill="none"
+                  stroke="var(--border-soft)"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeDasharray="0.5 10"
+                  mask={`url(#reveal-mask-${i})`}
+                />
               );
             })}
-          </defs>
-
-          {REVEAL_BOXES.map((box, i) => {
-            const c = REVEAL_BOXES[0] / 2;
-            const half = box / 2;
-            const d = `M ${c} ${c - half} L ${c + half} ${c} L ${c} ${c + half} L ${c - half} ${c} Z`;
-            return (
-              <path
-                key={box}
-                d={d}
-                fill="none"
-                stroke="var(--border-soft)"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeDasharray="0.5 10"
-                mask={`url(#reveal-mask-${i})`}
-              />
-            );
-          })}
-        </svg>
-      </div>
+          </svg>
+        </div>
+      )}
 
       <div ref={headerRef}>
         <SiteHeader section="INTRO" showEnterCode />
@@ -254,7 +309,7 @@ export default function IntroPage() {
 
           <div className="absolute bottom-6 left-6 z-10 md:bottom-auto md:left-10 md:top-1/2 md:-translate-y-1/2">
             <button
-              onClick={() => router.push("/discover")}
+              onClick={playDiscoverExit}
               onMouseEnter={() => discoverTimelineRef.current?.play()}
               onMouseLeave={() => discoverTimelineRef.current?.reverse()}
               className="group pointer-events-auto flex items-center gap-6 cursor-pointer"
@@ -332,7 +387,7 @@ export default function IntroPage() {
 
           <div className="absolute bottom-6 right-6 z-10 md:bottom-auto md:right-10 md:top-1/2 md:-translate-y-1/2">
             <button
-              onClick={() => router.push("/testing")}
+              onClick={playTakeTestExit}
               onMouseEnter={() => timelineRef.current?.play()}
               onMouseLeave={() => timelineRef.current?.reverse()}
               className="group pointer-events-auto flex items-center gap-6 cursor-pointer"
